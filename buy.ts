@@ -33,6 +33,8 @@ import bs58 from 'bs58';
 import * as fs from 'fs';
 import * as path from 'path';
 import BN from 'bn.js';
+import Fs from "@supercharge/fs";
+
 
 const transport = pino.transport({
   targets: [
@@ -67,6 +69,7 @@ const network = 'mainnet-beta';
 const RPC_ENDPOINT = retrieveEnvVariable('RPC_ENDPOINT', logger);
 const RPC_WEBSOCKET_ENDPOINT = retrieveEnvVariable('RPC_WEBSOCKET_ENDPOINT', logger);
 
+
 const solanaConnection = new Connection(RPC_ENDPOINT, {
   wsEndpoint: RPC_WEBSOCKET_ENDPOINT,
 });
@@ -97,10 +100,21 @@ const MAX_SELL_RETRIES = 60;
 
 let snipeList: string[] = [];
 
+const decodedKey = new Uint8Array(
+  JSON.parse(
+    Fs.readFileSync(Fs.homeDir("./Downloads/Projects/Trading_Bot/Solana_Bot/solana-sniper-bot/Key.json")).toString()
+  )
+);
+
+
+  // let keyPair = Keypair.fromSecretKey(decodedKey);
+
 async function init(): Promise<void> {
-  // get wallet
-  const PRIVATE_KEY = retrieveEnvVariable('PRIVATE_KEY', logger);
-  wallet = Keypair.fromSecretKey(bs58.decode(PRIVATE_KEY));
+
+  wallet = Keypair.fromSecretKey(decodedKey);
+
+
+  
   logger.info(`Wallet Address: ${wallet.publicKey}`);
 
   // get quote mint and amount
